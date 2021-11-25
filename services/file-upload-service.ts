@@ -5,6 +5,8 @@ import Busboy, {BusboyConfig, BusboyHeaders} from "busboy";
 import internal from "stream";
 import {APIErrors} from "../domain/error";
 
+// TODO: cuando llamo y n no es número, y además sin archivo, rompe la APP. HAY QUE ARREGLAR
+
 export interface IFileUploadService {
     handler(req: Request, res: Response, next: NextFunction);
 }
@@ -32,6 +34,7 @@ export default class FileUploadService implements IFileUploadService{
         let nMostUsedWords = 0;
         let fileUploaded = false;
         let limitExceeded = false;
+        let responseSent = false;
 
         this.busboyConfig.headers = req.headers as BusboyHeaders;
 
@@ -46,6 +49,7 @@ export default class FileUploadService implements IFileUploadService{
                 nMostUsedWords = Number.parseInt(value);
                 if (isNaN(nMostUsedWords)) {
                     nMostUsedWords = 0;
+                    responseSent = true;
                     res.status(APIErrors.NotANumber.status).json(APIErrors.NotANumber);
                 }
             }
@@ -59,6 +63,7 @@ export default class FileUploadService implements IFileUploadService{
 
             file.on('limit', () => {
                 limitExceeded = true;
+                responseSent = true;
                 res.status(APIErrors.FileSizeLimitExceeded.status).json(APIErrors.FileSizeLimitExceeded);
             });
 
@@ -91,6 +96,7 @@ export default class FileUploadService implements IFileUploadService{
                 // Comprueba que el máximo sea el número de palabras
                 let wordsCount = Object.keys(wordsMap).length;
                 if (wordsCount < nMostUsedWords) {
+                    responseSent = true;
                     res.status(APIErrors.NGreaterThanWords.status).json(APIErrors.NGreaterThanWords);
                     return;
                 }
@@ -106,7 +112,7 @@ export default class FileUploadService implements IFileUploadService{
         });
 
         busboy.on('finish', () => {
-            if (!fileUploaded) {
+            if (!responseSent && !fileUploaded) {
                 res.status(APIErrors.NoFileUploaded.status).json(APIErrors.NoFileUploaded);
             }
         });
