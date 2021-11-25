@@ -18,5 +18,9 @@ export const APIErrors  = {
     NoFileUploaded: {
       status: 400,
       message: 'no file being uploaded'
+    },
+    FileSizeLimitExceeded: {
+        status: 400,
+        message: 'file size limit exceeded'
     }
 }

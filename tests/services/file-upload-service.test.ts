@@ -2,6 +2,7 @@ import FileUploadService from "../../services/file-upload-service";
 import express from "express";
 import request from "supertest";
 import ApiRouter from "../../routes/api-router";
+import {BusboyConfig} from "busboy";
 
 describe('Tests for file upload service', () => {
     let app
@@ -63,6 +64,32 @@ describe('Tests for file upload service', () => {
                 status: 400,
                 message: 'no file being uploaded'
             });
+    });
+
+    test('Test filesize exceeded', async () => {
+        let app = express();
+        let service = new FileUploadService({
+            limits: {
+                files: 1,
+                fileSize: 10
+            }
+        } as BusboyConfig);
+
+        let apiRouter = new ApiRouter(service);
+        app.use('/v1', apiRouter.getRouter())
+
+        let buffer = Buffer.from('this is a very tiny buffer, but huge at the same time');
+
+        await request(app)
+            .post('/v1/upload')
+            .set({
+                'content-type': 'application/json'
+            })
+            .type('form')
+            .field('n', '2')
+            .attach('fileupload', buffer, 'file-name.txt')
+            .expect(400)
+            .expect({ status: 400, message: 'file size limit exceeded' });
     });
 
     test('Test words frequency ok with simple buffer', async () => {

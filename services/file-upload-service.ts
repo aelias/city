@@ -1,7 +1,7 @@
 import {Request, Response, NextFunction} from "express";
 import {APIResponse} from "../domain/api_response";
 
-import Busboy, {BusboyHeaders} from "busboy";
+import Busboy, {BusboyConfig, BusboyHeaders} from "busboy";
 import internal from "stream";
 import {APIErrors} from "../domain/error";
 
@@ -11,17 +11,31 @@ export interface IFileUploadService {
 
 export default class FileUploadService implements IFileUploadService{
 
+    busboyConfig: BusboyConfig
+
+    constructor(busboyConfig: BusboyConfig = null) {
+        if (busboyConfig) {
+            this.busboyConfig = busboyConfig;
+            this.busboyConfig.headers = null;
+        } else {
+            this.busboyConfig = {
+                headers: null,
+                    limits: {
+                        files: 1,
+                        fileSize: 1024*1024*1024
+                    }
+            }
+        }
+    }
+
     handler = (req: Request, res: Response, next: NextFunction) => {
         let nMostUsedWords = 0;
         let fileUploaded = false;
+        let limitExceeded = false;
 
-        let busboy = new Busboy({
-            headers: req.headers as BusboyHeaders,
-            limits: {
-                files: 1,
-                fileSize: 1024*1024*1024
-            }
-        });
+        this.busboyConfig.headers = req.headers as BusboyHeaders;
+
+        let busboy = new Busboy(this.busboyConfig);
 
         busboy.on('error', (err: unknown) => {
             console.log('busboy error: ' + err);
@@ -43,6 +57,11 @@ export default class FileUploadService implements IFileUploadService{
 
             fileUploaded = true;
 
+            file.on('limit', () => {
+                limitExceeded = true;
+                res.status(APIErrors.FileSizeLimitExceeded.status).json(APIErrors.FileSizeLimitExceeded);
+            });
+
             file.on('data', (data: any) => {
                 buffer += data.toString();
                 let toProcessData = buffer.slice(0, buffer.lastIndexOf('\n'));
@@ -60,6 +79,10 @@ export default class FileUploadService implements IFileUploadService{
             });
 
             file.on('end', () => {
+                if (limitExceeded) {
+                    console.log('ends because limit exceeded. Response already sent');
+                    return;
+                }
                 // Comprueba error en la lectura del field
                 if (nMostUsedWords == 0) {
                     console.log('there was an error reading n field');
