@@ -5,8 +5,6 @@ import Busboy, {BusboyConfig, BusboyHeaders} from "busboy";
 import internal from "stream";
 import {APIErrors} from "../domain/error";
 
-// TODO: cuando llamo y n no es número, y además sin archivo, rompe la APP. HAY QUE ARREGLAR
-
 export interface IFileUploadService {
     handler(req: Request, res: Response, next: NextFunction);
 }
