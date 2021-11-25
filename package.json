@@ -4,6 +4,8 @@
   "description": "Exercise for CITY (Siono)",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "node ./dist/app.js",
     "serve": "nodemon app.ts",
     "test": "jest"
   },
