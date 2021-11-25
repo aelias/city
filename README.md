@@ -89,6 +89,13 @@ curl --location --request POST 'localhost:3000/v1/upload' \
 }
 ```
 
+### Docker support (run)
+- Check docker is properly installed in your system
+- Build the image: `docker build -t test-city`
+- Run the image: `docker run -it -p 3000:3000 test-city`
+
+Now you have the API running in a docker container
+
 ### Space to improve
 - Work over chunks of received data to process them in an async way
 - Improve architecture
