@@ -5,6 +5,7 @@ import Busboy, {BusboyConfig, BusboyHeaders} from "busboy";
 import internal from "stream";
 import {APIErrors} from "../domain/error";
 import * as Buffer from "buffer";
+import {logger} from "../logger/winston";
 
 export interface IFileUploadService {
     handler(req: Request, res: Response);
@@ -40,7 +41,7 @@ export default class FileUploadService implements IFileUploadService{
         const busboy = new Busboy(this.busboyConfig);
 
         busboy.on('error', (err: unknown) => {
-            console.log('busboy error: ' + err);
+            logger.error('busboy error: ' + err);
         });
 
         busboy.on('field', (name: string, value: string) => {
@@ -80,7 +81,7 @@ export default class FileUploadService implements IFileUploadService{
                 buffer = buffer.slice(lastIndexEOL + 1);
                 const words = FileUploadService.bufferToWords(toProcessData);
                 if (!words) {
-                    console.log("no words to process after regex");
+                    logger.info("no words to process after regex");
                     return;
                 }
                 words.forEach(word => {
@@ -91,12 +92,12 @@ export default class FileUploadService implements IFileUploadService{
 
             file.on('end', () => {
                 if (limitExceeded) {
-                    console.log('ends because limit exceeded. Response already sent');
+                    logger.error('ends because limit exceeded. Response already sent');
                     return;
                 }
                 // Check for field reading error
                 if (nMostUsedWords == 0) {
-                    console.log('there was an error reading n field');
+                    logger.error('there was an error reading n field');
                     return;
                 }
 
@@ -125,12 +126,13 @@ export default class FileUploadService implements IFileUploadService{
             });
 
             file.on('error', (err: Error) => {
-                console.log('File error: ' + err);
+                logger.error('File error: ' + err);
             });
         });
 
         busboy.on('finish', () => {
             if (!responseSent && !fileUploaded) {
+                logger.error('no file being uploaded')
                 res.status(APIErrors.NoFileUploaded.status).json(APIErrors.NoFileUploaded);
             }
         });
