@@ -1,5 +1,5 @@
 import {Request, Response} from "express";
-import {APIResponse} from "../domain/api_response";
+import {IAPIResponse} from "../domain/api_response";
 
 import Busboy, {BusboyConfig, BusboyHeaders} from "busboy";
 import internal from "stream";
@@ -102,7 +102,7 @@ export default class FileUploadService implements IFileUploadService{
 
                 // Check for last chunk not processed
                 if (buffer.length > 0) {
-                    const words = FileUploadService.bufferToWords(buffer)
+                    const words:RegExpMatchArray = FileUploadService.bufferToWords(buffer)
                     if (words) {
                         words.forEach(word => {
                             const key = word.toLowerCase();
@@ -112,14 +112,14 @@ export default class FileUploadService implements IFileUploadService{
                 }
 
                 // Check against total number of words in the file
-                const wordsCount = Object.keys(wordsMap).length;
+                const wordsCount:number = Object.keys(wordsMap).length;
                 if (wordsCount < nMostUsedWords) {
                     responseSent = true;
                     res.status(APIErrors.NGreaterThanWords.status).json(APIErrors.NGreaterThanWords);
                     return;
                 }
 
-                const arr = FileUploadService.convertDictToArrayAndReturnNGreater(wordsMap, nMostUsedWords);
+                const arr: Array<Array<[string][number]>> = FileUploadService.convertDictToArrayAndReturnNGreater(wordsMap, nMostUsedWords);
                 wordsMap = {};
                 res.status(200).json(FileUploadService.buildResponse(arr));
             });
@@ -138,13 +138,13 @@ export default class FileUploadService implements IFileUploadService{
         req.pipe(busboy);
     }
 
-    static bufferToWords = (buffer:string) => {
+    static bufferToWords = (buffer:string): RegExpMatchArray => {
         const regex = /([a-z])\w+/gi;
         return buffer.match(regex);
     }
 
-    static buildResponse = (arr) => {
-        const response:APIResponse = {
+    static buildResponse = (arr): IAPIResponse => {
+        const response:IAPIResponse = {
             frequencies: []
         };
         arr.forEach((el) => {
@@ -156,7 +156,7 @@ export default class FileUploadService implements IFileUploadService{
         return response;
     }
 
-    static convertDictToArrayAndReturnNGreater(dict, nMostFrequent) {
+    static convertDictToArrayAndReturnNGreater = (dict, nMostFrequent) => {
         // Create items array
         const items = Object.keys(dict).map(function(key) {
             return [key, dict[key]];

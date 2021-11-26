@@ -1,9 +1,9 @@
-export interface Frequency {
+export interface IFrequency {
     word: string
     count: number
 }
 
-export interface APIResponse {
-    frequencies: Frequency[]
+export interface IAPIResponse {
+    frequencies: IFrequency[]
 }
 

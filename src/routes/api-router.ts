@@ -1,4 +1,4 @@
-import express, {Router} from "express";
+import express, {Router, Request, Response} from "express";
 import {IFileUploadService} from "../services/file-upload-service";
 import {APIErrors} from "../domain/error";
 
@@ -18,7 +18,7 @@ export default class ApiRouter {
         this.theRouter.post(MOST_FREQUENT_WORDS_ENDPOINT, this.uploadFile);
     }
 
-    uploadFile = (req, res) => {
+    uploadFile = (req:Request, res:Response) => {
         if (req.headers['content-type'] === undefined) {
             res.status(APIErrors.NoContentTypeHeader.status).json(APIErrors.NoContentTypeHeader);
             return;
