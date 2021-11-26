@@ -101,6 +101,7 @@ curl --location --request POST 'localhost:3000/v1/most-frequent-words' \
 Now you have the API running in a docker container
 
 ### Space to improve
+- Add `winston` (or similar) for a proper logging experience.
 - Add environment variables and separated configs for development
   and production environments.
 - Work over chunks of received data to process them in an async way.
@@ -118,4 +119,3 @@ Now you have the API running in a docker container
   and once all chunks are being processed, no matter what instance do the work, 
   the answer service take the "transaction completed message" for this transaction 
   from the message bus and forward results to the client.
-
