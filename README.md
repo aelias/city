@@ -1,6 +1,34 @@
 # CITY Exercise
 NodeJS + Typescript exercise for CITY
 
+## Problem description
+A fictional client has requested a Node.js server with an API that can compute the top N most frequent (not case sensitive) words in a text file. The API must meet the following specifications:
+Inputs: The API must be able to accept a (potentially large) text file and an arbitrary integer N. The inputs will have the following constraints:
+* file content will be at maximum 1gb of text content - we will be testing your solution with large files up to this limit
+* file content will always be utf8
+* n can be any positive integer in the following range: [1, K] where K is the number of unique words in the text file
+
+Outputs: The API is expected to return the top N most frequent words in the text file as JSON.
+For example:
+```
+{
+    "frequencies": [
+        {
+            "word": "sed",
+            "count": 12
+        },
+        {
+            "word": "id",
+            "count": 10
+        },
+        {
+            "word": "sit",
+            "count": 8
+        }
+    ]
+}
+```
+
 ### How to start locally?
 
 - Clone this repo: `git clone https://github.com/aelias/city.git`
@@ -101,14 +129,16 @@ curl --location --request POST 'localhost:3000/v1/most-frequent-words' \
 Now you have the API running in a docker container
 
 ### Space to improve
-- Add `winston` (or similar) for a proper logging experience.
+- Add better `winston` configuration, so maybe can send logs to
+  a centralized log container (like elastic search + kibana).
 - Add environment variables and separated configs for development
   and production environments.
 - Work over chunks of received data to process them in an async way.
 - Improve architecture.
-- Add load tests to the project
-- Add metrics to the code (newrelic and datadog), for measuring and
-  tracking errors.
+- Add load tests to the project.
+- Generate metrics to build datadog dashboards.
+- Add alerts based in datadog metrics (opsgenie or similar).
+- Add newrelic support, for centralized error tracking.
 
 #### Beyond the requirements. Needs to be discussed with stakeholders
 - Convert the API to an async API, using message bus (maybe Kafka) and callbacks
