@@ -11,11 +11,12 @@ COPY package*.json ./
 COPY tsconfig.json ./
 COPY jest.config.js ./
 # APP code
-COPY src/app.ts ./
-ADD src/routes ./routes
-ADD src/domain ./domain
-ADD src/services ./services
-ADD src/logger ./logger
+RUN mkdir src
+COPY src/app.ts ./src
+ADD src/routes ./src/routes
+ADD src/domain ./src/domain
+ADD src/services ./src/services
+ADD src/logger ./src/logger
 
 # check files list
 RUN ls -a
