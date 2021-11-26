@@ -17,6 +17,52 @@ describe('Tests for file upload service', () => {
         app.use('/v1', apiRouter.getRouter())
     });
 
+    test('Test static method convertDictToArrayAndReturnNGreater', () => {
+        const dict = {
+            "one": 5,
+            "another": 10,
+            "greater": 20,
+        }
+        const arr = FileUploadService.convertDictToArrayAndReturnNGreater(dict, 1);
+        expect(arr).toStrictEqual([["greater", 20]]);
+        const arr2 = FileUploadService.convertDictToArrayAndReturnNGreater(dict, 2);
+        expect(arr2).toStrictEqual([["greater", 20], ["another", 10]]);
+        const arr3 = FileUploadService.convertDictToArrayAndReturnNGreater(dict, 10);
+        expect(arr3).toStrictEqual([["greater", 20], ["another", 10], ["one", 5]]);
+    });
+
+    test('Test static method buildResponse', () => {
+        const dict = {
+            "one": 5,
+            "another": 10,
+            "greater": 20,
+        }
+        const arr = FileUploadService.convertDictToArrayAndReturnNGreater(dict, 2);
+        expect(FileUploadService.buildResponse(arr)).toStrictEqual({
+            frequencies: [
+                {
+                    "count": 20,
+                    "word": "greater"
+                },
+                {
+                    "count": 10,
+                    "word": "another"
+                }
+            ]
+        });
+    });
+
+    test('Test static method buildResponse', () => {
+        let buffer: string = "uno dos dos tres";
+        expect(FileUploadService.bufferToWords(buffer)).toStrictEqual(["uno", "dos", "dos", "tres"]);
+
+        buffer = "uno/ dos, dos# tres";
+        expect(FileUploadService.bufferToWords(buffer)).toStrictEqual(["uno", "dos", "dos", "tres"]);
+
+        buffer = "uno/ dos, dos#\n tres";
+        expect(FileUploadService.bufferToWords(buffer)).toStrictEqual(["uno", "dos", "dos", "tres"]);
+    });
+
     test('n is not a number', async () => {
         const NOT_A_NUMBER = 'NaN';
 
