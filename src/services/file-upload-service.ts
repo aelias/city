@@ -6,7 +6,7 @@ import internal from "stream";
 import {APIErrors} from "../domain/error";
 
 export interface IFileUploadService {
-    handler(req: Request, res: Response, next: NextFunction);
+    handler(req: Request, res: Response);
 }
 
 export default class FileUploadService implements IFileUploadService{
@@ -28,7 +28,7 @@ export default class FileUploadService implements IFileUploadService{
         }
     }
 
-    handler = (req: Request, res: Response, next: NextFunction) => {
+    handler = (req: Request, res: Response) => {
         let nMostUsedWords = 0;
         let fileUploaded = false;
         let limitExceeded = false;
@@ -36,20 +36,24 @@ export default class FileUploadService implements IFileUploadService{
 
         this.busboyConfig.headers = req.headers as BusboyHeaders;
 
-        let busboy = new Busboy(this.busboyConfig);
+        const busboy = new Busboy(this.busboyConfig);
 
         busboy.on('error', (err: unknown) => {
             console.log('busboy error: ' + err);
         });
 
         busboy.on('field', (name: string, value: string) => {
-            if (name === 'n') {
-                nMostUsedWords = Number.parseInt(value);
-                if (isNaN(nMostUsedWords)) {
-                    nMostUsedWords = 0;
-                    responseSent = true;
-                    res.status(APIErrors.NotANumber.status).json(APIErrors.NotANumber);
-                }
+            if (name !== 'n') {
+                responseSent = true;
+                res.status(APIErrors.NotExpectedFieldName.status).json(APIErrors.NotExpectedFieldName);
+                return;
+            }
+
+            nMostUsedWords = Number.parseInt(value);
+            if (isNaN(nMostUsedWords)) {
+                nMostUsedWords = 0;
+                responseSent = true;
+                res.status(APIErrors.NotANumber.status).json(APIErrors.NotANumber);
             }
         });
 
@@ -67,16 +71,16 @@ export default class FileUploadService implements IFileUploadService{
 
             file.on('data', (data: any) => {
                 buffer += data.toString();
-                let toProcessData = buffer.slice(0, buffer.lastIndexOf('\n'));
+                const toProcessData = buffer.slice(0, buffer.lastIndexOf('\n'));
                 buffer = buffer.slice(buffer.lastIndexOf('\n'));
-                let regex = /([a-z])\w+/gi;
-                let words = toProcessData.match(regex);
+                const regex = /([a-z])\w+/gi;
+                const words = toProcessData.match(regex);
                 if (!words) {
                     console.log("no words to process after regex");
                     return;
                 }
                 words.forEach(word => {
-                    let key = word.toLowerCase();
+                    const key = word.toLowerCase();
                     wordsMap[key] = (wordsMap[key] || 0 ) + 1
                 });
             });
@@ -92,14 +96,14 @@ export default class FileUploadService implements IFileUploadService{
                     return;
                 }
                 // Comprueba que el máximo sea el número de palabras
-                let wordsCount = Object.keys(wordsMap).length;
+                const wordsCount = Object.keys(wordsMap).length;
                 if (wordsCount < nMostUsedWords) {
                     responseSent = true;
                     res.status(APIErrors.NGreaterThanWords.status).json(APIErrors.NGreaterThanWords);
                     return;
                 }
 
-                let arr = FileUploadService.convertDictToArrayAndReturnNGreater(wordsMap, nMostUsedWords);
+                const arr = FileUploadService.convertDictToArrayAndReturnNGreater(wordsMap, nMostUsedWords);
                 wordsMap = {};
                 res.status(200).json(FileUploadService.buildResponse(arr));
             });
@@ -119,7 +123,7 @@ export default class FileUploadService implements IFileUploadService{
     }
 
     static buildResponse = (arr) => {
-        let response:APIResponse = {
+        const response:APIResponse = {
             frequencies: []
         };
         arr.forEach((el) => {
@@ -133,7 +137,7 @@ export default class FileUploadService implements IFileUploadService{
 
     static convertDictToArrayAndReturnNGreater(dict, nMostFrequent) {
         // Create items array
-        let items = Object.keys(dict).map(function(key) {
+        const items = Object.keys(dict).map(function(key) {
             return [key, dict[key]];
         });
 
@@ -143,7 +147,7 @@ export default class FileUploadService implements IFileUploadService{
         });
 
         // Create a new array with only the first nMostFrequent items
-        let newArr = items.slice(0, nMostFrequent);
+        const newArr = items.slice(0, nMostFrequent);
         return newArr;
     }
 }

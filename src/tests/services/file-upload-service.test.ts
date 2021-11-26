@@ -34,6 +34,23 @@ describe('Tests for file upload service', () => {
             .expect({ status: 400, message: 'n is not a number' });
     });
 
+    test('not expected field name', async () => {
+        const NOT_A_NUMBER = 'NaN';
+
+        let buffer = Buffer.from('one one two three');
+
+        await request(app)
+            .post(COMPLETE_ENDPOINT)
+            .set({
+                'content-type': 'application/json'
+            })
+            .type('form')
+            .field('no_expected', NOT_A_NUMBER)
+            .attach('fileupload', buffer, 'custom_file_name.txt')
+            .expect(400)
+            .expect({ status: 400, message: 'not expected field name' });
+    });
+
     test('Test fail n is greater than number of words', async () => {
         let buffer = Buffer.from('one one two two two three three four');
 

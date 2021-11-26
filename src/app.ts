@@ -13,7 +13,7 @@ let apiRouter = new ApiRouter(fileUploadService);
 app.use('/v1', apiRouter.getRouter());
 
 app.listen(port, () => {
-    console.log(`Most repeated words API running on port ${port}.`);
+    console.log(`Most frequent words API running on port ${port}.`);
 });
 
 

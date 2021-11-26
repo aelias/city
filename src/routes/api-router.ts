@@ -27,7 +27,7 @@ export default class ApiRouter {
             res.status(APIErrors.NoExpectedContentTypeHeader.status).json(APIErrors.NoExpectedContentTypeHeader);
             return;
         }
-        this.fileUploadService.handler(req, res, null)
+        this.fileUploadService.handler(req, res)
     }
 
     getRouter = () => {

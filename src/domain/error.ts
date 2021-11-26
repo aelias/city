@@ -11,6 +11,10 @@ export const APIErrors  = {
         status: 400,
         message: 'n is not a number'
     },
+    NotExpectedFieldName: {
+        status: 400,
+        message: 'not expected field name'
+    },
     NGreaterThanWords: {
         status: 400,
         message: 'n is greater than the amount of words in the file'
