@@ -120,7 +120,7 @@ export default class FileUploadService implements IFileUploadService{
                     return;
                 }
 
-                const arr: Array<Array<[string][number]>> = FileUploadService.convertDictToArrayAndReturnNGreater(wordsMap, nMostUsedWords);
+                const arr: [string, number][] = FileUploadService.convertDictToArrayAndReturnNGreater(wordsMap, nMostUsedWords);
                 wordsMap = {};
                 res.status(200).json(FileUploadService.buildResponse(arr));
             });
@@ -158,10 +158,10 @@ export default class FileUploadService implements IFileUploadService{
         return response;
     }
 
-    static convertDictToArrayAndReturnNGreater = (dict, nMostFrequent) => {
+    static convertDictToArrayAndReturnNGreater = (dict, nMostFrequent): [string, number][] => {
         // Create items array
-        const items = Object.keys(dict).map(function(key) {
-            return [key, dict[key]];
+        const items: [string, number][] = Object.keys(dict).map(function(key) {
+            return [key, dict[key] as number];
         });
 
         // Sort the array based on the second element
