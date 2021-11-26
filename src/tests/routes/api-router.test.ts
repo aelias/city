@@ -1,8 +1,9 @@
-import ApiRouter from "../../routes/api-router";
+import ApiRouter, {MOST_FREQUENT_WORDS_ENDPOINT} from "../../routes/api-router";
 import request from "supertest";
 import express, {Request, Response, NextFunction} from "express";
 
 describe('Testing file controller', () => {
+    let COMPLETE_ENDPOINT = '/v1' + MOST_FREQUENT_WORDS_ENDPOINT
 
     test('Test get not allowed', async () => {
         let app = express();
@@ -13,7 +14,7 @@ describe('Testing file controller', () => {
         }
         let fController = new ApiRouter(mockService)
         app.use('/v1', fController.getRouter());
-        let response = await request(app).get('/v1/upload');
+        let response = await request(app).get(COMPLETE_ENDPOINT);
         expect(response.status).toBe(404);
     });
 
@@ -27,7 +28,7 @@ describe('Testing file controller', () => {
         let fController = new ApiRouter(mockService)
         app.use('/v1', fController.getRouter());
 
-        let response = await request(app).post('/v1/upload');
+        let response = await request(app).post(COMPLETE_ENDPOINT);
         expect(response.status).toBe(400);
         expect(response.body.status).toBe(400);
         expect(response.body.message).toBe('No content-type header defined in call')
@@ -44,7 +45,7 @@ describe('Testing file controller', () => {
         app.use('/v1', fController.getRouter());
 
         let response = await request(app)
-            .post('/v1/upload')
+            .post(COMPLETE_ENDPOINT)
             .set({
                 'content-type': 'application/json'
             });
@@ -67,7 +68,7 @@ describe('Testing file controller', () => {
         app.use('/v1', fController.getRouter());
 
         await request(app)
-            .post('/v1/upload')
+            .post(COMPLETE_ENDPOINT)
             .set({
                 'content-type': 'multipart/form-data; boundary=-----12348756'
             })

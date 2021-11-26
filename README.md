@@ -21,7 +21,7 @@ in the `./dist` folder.
 ### Example requests and responses
 #### Request: 
 ```bash
-curl --location --request POST 'localhost:3000/v1/upload' \
+curl --location --request POST 'localhost:3000/v1/most-frequent-words' \
 --form 'n="3"' \
 --form 'file=@"./libro.txt"'
 ```
@@ -48,7 +48,7 @@ curl --location --request POST 'localhost:3000/v1/upload' \
 
 #### Request:
 ```bash
-curl --location --request POST 'localhost:3000/v1/upload' \
+curl --location --request POST 'localhost:3000/v1/most-frequent-words' \
 --form 'n="ppp"' \
 --form 'file=@"./libro.txt"'
 ```
@@ -62,7 +62,7 @@ curl --location --request POST 'localhost:3000/v1/upload' \
 ```
 #### Request:
 ```bash
-curl --location --request POST 'localhost:3000/v1/upload' \
+curl --location --request POST 'localhost:3000/v1/most-frequent-words' \
 --form 'n="3"' \
 ```
 #### Response
@@ -76,7 +76,7 @@ curl --location --request POST 'localhost:3000/v1/upload' \
 
 #### Request:
 ```bash
-curl --location --request POST 'localhost:3000/v1/upload' \
+curl --location --request POST 'localhost:3000/v1/most-frequent-words' \
 --form 'n="100000000"' \
 --form 'file=@"./libro.txt"'
 ```
@@ -97,9 +97,13 @@ curl --location --request POST 'localhost:3000/v1/upload' \
 Now you have the API running in a docker container
 
 ### Space to improve
-- Work over chunks of received data to process them in an async way
-- Improve architecture
+- Add environment variables and separated configs for development
+  and production environments.
+- Work over chunks of received data to process them in an async way.
+- Improve architecture.
 - Add load tests to the project
+- Add metrics to the code (newrelic and datadog), for measuring and
+  tracking errors.
 
 #### Beyond the requirements. Needs to be discussed with stakeholders
 - Convert the API to an async API, using message bus (maybe Kafka) and callbacks

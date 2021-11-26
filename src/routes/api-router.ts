@@ -2,7 +2,7 @@ import express, {Router} from "express";
 import {IFileUploadService} from "../services/file-upload-service";
 import {APIErrors} from "../domain/error";
 
-const UPLOAD = '/upload';
+export const MOST_FREQUENT_WORDS_ENDPOINT = '/most-frequent-words';
 
 export default class ApiRouter {
     theRouter: Router;
@@ -15,7 +15,7 @@ export default class ApiRouter {
     }
 
     setupRoutes = () => {
-        this.theRouter.post(UPLOAD, this.uploadFile);
+        this.theRouter.post(MOST_FREQUENT_WORDS_ENDPOINT, this.uploadFile);
     }
 
     uploadFile = (req, res) => {

@@ -1,10 +1,11 @@
 import FileUploadService from "../../services/file-upload-service";
 import express from "express";
 import request from "supertest";
-import ApiRouter from "../../routes/api-router";
+import ApiRouter, {MOST_FREQUENT_WORDS_ENDPOINT} from "../../routes/api-router";
 import {BusboyConfig} from "busboy";
 
 describe('Tests for file upload service', () => {
+    const COMPLETE_ENDPOINT = '/v1' + MOST_FREQUENT_WORDS_ENDPOINT
     let app
     let service
     let apiRouter
@@ -22,7 +23,7 @@ describe('Tests for file upload service', () => {
         let buffer = Buffer.from('one one two three');
 
         await request(app)
-            .post('/v1/upload')
+            .post(COMPLETE_ENDPOINT)
             .set({
                 'content-type': 'application/json'
             })
@@ -37,7 +38,7 @@ describe('Tests for file upload service', () => {
         let buffer = Buffer.from('one one two two two three three four');
 
         await request(app)
-            .post('/v1/upload')
+            .post(COMPLETE_ENDPOINT)
             .set({
                 'content-type': 'application/json'
             })
@@ -53,7 +54,7 @@ describe('Tests for file upload service', () => {
 
     test('Test no file is being uploaded', async () => {
         await request(app)
-            .post('/v1/upload')
+            .post(COMPLETE_ENDPOINT)
             .set({
                 'content-type': 'application/json'
             })
@@ -81,7 +82,7 @@ describe('Tests for file upload service', () => {
         let buffer = Buffer.from('this is a very tiny buffer, but huge at the same time');
 
         await request(app)
-            .post('/v1/upload')
+            .post(COMPLETE_ENDPOINT)
             .set({
                 'content-type': 'application/json'
             })
@@ -96,7 +97,7 @@ describe('Tests for file upload service', () => {
         let buffer = Buffer.from('one one two two two three three four');
 
         await request(app)
-            .post('/v1/upload')
+            .post(COMPLETE_ENDPOINT)
             .set({
                 'content-type': 'application/json'
             })
@@ -117,7 +118,7 @@ describe('Tests for file upload service', () => {
         let buffer = Buffer.from('one. one two two, two three/ three four');
 
         await request(app)
-            .post('/v1/upload')
+            .post(COMPLETE_ENDPOINT)
             .set({
                 'content-type': 'application/json'
             })
@@ -147,7 +148,7 @@ Phasellus vel dolor nibh. Nam ut efficitur quam, sed mattis turpis. Curabitur co
 `)
 
         await request(app)
-            .post('/v1/upload')
+            .post(COMPLETE_ENDPOINT)
             .set({
                 'content-type': 'application/json'
             })
