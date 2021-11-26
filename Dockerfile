@@ -15,6 +15,7 @@ COPY src/app.ts ./
 ADD src/routes ./routes
 ADD src/domain ./domain
 ADD src/services ./services
+ADD src/logger ./logger
 
 # check files list
 RUN ls -a
