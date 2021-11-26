@@ -1,9 +1,10 @@
-import {Request, Response, NextFunction} from "express";
+import {Request, Response} from "express";
 import {APIResponse} from "../domain/api_response";
 
 import Busboy, {BusboyConfig, BusboyHeaders} from "busboy";
 import internal from "stream";
 import {APIErrors} from "../domain/error";
+import * as Buffer from "buffer";
 
 export interface IFileUploadService {
     handler(req: Request, res: Response);
@@ -57,7 +58,7 @@ export default class FileUploadService implements IFileUploadService{
             }
         });
 
-        busboy.on('file', (field_name, file: internal.Readable, filename: string, encoding: string, mimetype:string) => {
+        busboy.on('file', (field_name, file: internal.Readable) => {
             let buffer = '';
             let wordsMap = {};
 
@@ -69,12 +70,15 @@ export default class FileUploadService implements IFileUploadService{
                 res.status(APIErrors.FileSizeLimitExceeded.status).json(APIErrors.FileSizeLimitExceeded);
             });
 
-            file.on('data', (data: any) => {
+            file.on('data', (data: Buffer) => {
                 buffer += data.toString();
-                const toProcessData = buffer.slice(0, buffer.lastIndexOf('\n'));
-                buffer = buffer.slice(buffer.lastIndexOf('\n'));
-                const regex = /([a-z])\w+/gi;
-                const words = toProcessData.match(regex);
+                let lastIndexEOL = buffer.lastIndexOf('\n')
+                if (lastIndexEOL == -1) {
+                    lastIndexEOL = buffer.lastIndexOf(' ');
+                }
+                const toProcessData = buffer.slice(0, lastIndexEOL);
+                buffer = buffer.slice(lastIndexEOL + 1);
+                const words = FileUploadService.bufferToWords(toProcessData);
                 if (!words) {
                     console.log("no words to process after regex");
                     return;
@@ -90,12 +94,24 @@ export default class FileUploadService implements IFileUploadService{
                     console.log('ends because limit exceeded. Response already sent');
                     return;
                 }
-                // Comprueba error en la lectura del field
+                // Check for field reading error
                 if (nMostUsedWords == 0) {
                     console.log('there was an error reading n field');
                     return;
                 }
-                // Comprueba que el máximo sea el número de palabras
+
+                // Check for last chunk not processed
+                if (buffer.length > 0) {
+                    const words = FileUploadService.bufferToWords(buffer)
+                    if (words) {
+                        words.forEach(word => {
+                            const key = word.toLowerCase();
+                            wordsMap[key] = (wordsMap[key] || 0) + 1
+                        });
+                    }
+                }
+
+                // Check against total number of words in the file
                 const wordsCount = Object.keys(wordsMap).length;
                 if (wordsCount < nMostUsedWords) {
                     responseSent = true;
@@ -120,6 +136,11 @@ export default class FileUploadService implements IFileUploadService{
         });
 
         req.pipe(busboy);
+    }
+
+    static bufferToWords = (buffer:string) => {
+        const regex = /([a-z])\w+/gi;
+        return buffer.match(regex);
     }
 
     static buildResponse = (arr) => {
@@ -147,7 +168,6 @@ export default class FileUploadService implements IFileUploadService{
         });
 
         // Create a new array with only the first nMostFrequent items
-        const newArr = items.slice(0, nMostFrequent);
-        return newArr;
+        return items.slice(0, nMostFrequent);
     }
 }

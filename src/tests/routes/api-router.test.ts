@@ -8,7 +8,7 @@ describe('Testing file controller', () => {
     test('Test get not allowed', async () => {
         let app = express();
         let mockService = {
-            handler: (req:Request, res:Response, next:NextFunction) => {
+            handler: (req:Request, res:Response) => {
                 return "";
             }
         }
@@ -21,7 +21,7 @@ describe('Testing file controller', () => {
     test('Test post fails if content-type is not present ', async () => {
         let app = express();
         let mockService = {
-            handler: (req:Request, res:Response, next:NextFunction) => {
+            handler: (req:Request, res:Response) => {
                 return "";
             }
         }
@@ -37,7 +37,7 @@ describe('Testing file controller', () => {
     test('Test fail no expected content-type header', async () => {
         let app = express();
         let mockService = {
-            handler: (req:Request, res:Response, next:NextFunction) => {
+            handler: (req:Request, res:Response) => {
                 return "";
             }
         }
@@ -57,7 +57,7 @@ describe('Testing file controller', () => {
     test('Test service handler is called ', async () => {
         let app = express();
         let mockService = {
-            handler: (req:Request, res:Response, next:NextFunction) => {
+            handler: (req:Request, res:Response) => {
                 res.status(200).json({
                     status: 200,
                     message: 'service handler called'

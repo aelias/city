@@ -131,6 +131,27 @@ describe('Tests for file upload service', () => {
             });
     });
 
+    test('Test last chunk left in buffer', async () => {
+        let buffer = Buffer.from('one one two two two three\n three four');
+
+        await request(app)
+            .post(COMPLETE_ENDPOINT)
+            .set({
+                'content-type': 'application/json'
+            })
+            .type('form')
+            .field('n', '3')
+            .attach('fileupload', buffer, 'custom_file_name.txt')
+            .expect(200)
+            .expect({
+                frequencies: [
+                    { word: 'two', count: 3 },
+                    { word: 'one', count: 2 },
+                    { word: 'three', count: 2 }
+                ]
+            });
+    });
+
     test('words frequency ok with punctuation characters', async () => {
         let buffer = Buffer.from('one. one two two, two three/ three four');
 

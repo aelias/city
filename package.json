@@ -8,6 +8,7 @@
     "start": "node ./dist/src/app.js",
     "serve": "nodemon src/app.ts",
     "test": "jest",
+    "coverage": "jest --coverage",
     "lint": "eslint src/**/*.ts",
     "format": "eslint src/**/*.ts --fix"
   },
