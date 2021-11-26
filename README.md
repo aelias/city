@@ -11,7 +11,11 @@ NodeJS + Typescript exercise for CITY
 - Just run `npm test` in the root directory, after installing dependencies
 
 ### How to see coverage
-- Just run `npx jest --coverage` in the root directory to see the coverage
+- Just run `npm run coverage` in the root directory to see the coverage
+
+### For linting
+- Run `npm run lint` for linting hints
+- Run `npm run format` for code formatting
 
 ### How to build the project
 After installing dependencies (see previous instructions) you can simply type 
